@@ -1,5 +1,6 @@
 package com.github.gtvb.stns.infra.repository;
 
+import java.net.PasswordAuthentication;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,15 +16,19 @@ public class UserRepository {
         this.dbConnection = dbConnection;
     }
 
-    public void createUser(String username, String userPassword) {
+    public User createUser(String username, String userPassword) {
         String query = "INSERT INTO User (id, username, user_password) VALUES (?, ?, ?, ?);";
         try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
-            stmt.setString(1, UUID.randomUUID().toString());
+            String userId = UUID.randomUUID().toString();
+            stmt.setString(1, userId);
             stmt.setString(2, username);
             stmt.setString(3, userPassword);
             stmt.executeQuery();
+
+            return new User(userId, username, userPassword);
         } catch(SQLException e) {
             e.printStackTrace();
+            return null;
         }
     };
 
@@ -43,6 +48,31 @@ public class UserRepository {
                 String createdAt = results.getString("created_at");
 
                 user = new User(id, username, userPassword, createdAt);
+            }
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+
+        return user;
+    };
+
+    public User getUserByNameAndPassword(String username, String password) {
+        User user = null;
+
+        String query = "SELECT id, username, user_password, created_at FROM User WHERE username = ? AND user_password = ?";
+
+        try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
+            stmt.setString(1, username);
+            stmt.setString(1, password);
+            ResultSet results = stmt.executeQuery();
+
+            while(results.next()) {
+                String id = results.getString("id");
+                String name = results.getString("username");
+                String userPassword = results.getString("user_password");
+                String createdAt = results.getString("created_at");
+
+                user = new User(id, name, userPassword, createdAt);
             }
         } catch(SQLException e) {
             e.printStackTrace();

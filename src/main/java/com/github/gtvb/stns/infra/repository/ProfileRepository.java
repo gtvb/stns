@@ -15,13 +15,12 @@ public class ProfileRepository {
         this.dbConnection = dbConnection;
     }
 
-    public void createProfile(String userId, String noteDisplayStyle, String fullName) {
-        String query = "INSERT INTO Profile (id, user_id, note_display_style, full_name) VALUES (?, ?, ?, ?);";
+    public void createProfile(String userId, String fullName) {
+        String query = "INSERT INTO Profile (id, user_id, full_name) VALUES (?, ?, ?);";
         try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
             stmt.setString(1, UUID.randomUUID().toString());
             stmt.setString(2, userId);
-            stmt.setString(3, noteDisplayStyle);
-            stmt.setString(4, fullName);
+            stmt.setString(3, fullName);
             stmt.executeQuery();
         } catch(SQLException e) {
             e.printStackTrace();
@@ -31,7 +30,7 @@ public class ProfileRepository {
     public Profile getProfileByUserId(String userId) {
         Profile profile = null;
 
-        String query = "SELECT id, note_display_style, full_name FROM Profile WHERE user_id = ?";
+        String query = "SELECT id, full_name FROM Profile WHERE user_id = ?";
 
         try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
             stmt.setString(1, userId);
@@ -39,27 +38,15 @@ public class ProfileRepository {
 
             while(results.next()) {
                 String id = results.getString("id");
-                String noteDisplayStyle = results.getString("note_display_style");
                 String fullName = results.getString("full_name");
 
-                profile = new Profile(id, userId, noteDisplayStyle, fullName);
+                profile = new Profile(id, userId, fullName);
             }
         } catch(SQLException e) {
             e.printStackTrace();
         }
 
         return profile;
-    };
-
-    public void editProfileNoteDisplayStyle(String profileId, String newNoteDisplayStyle) {
-        String query = "UPDATE Profile SET note_display_style = ? WHERE id = ?";
-        try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
-            stmt.setString(1, newNoteDisplayStyle);
-            stmt.setString(2, profileId);
-            stmt.executeQuery();
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }
     };
 
     public void editProfileFullName(String profileId, String newFullName) {
