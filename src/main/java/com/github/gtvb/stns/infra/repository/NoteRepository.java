@@ -62,7 +62,7 @@ public class NoteRepository {
         String query = "DELETE FROM Note WHERE id = ?";
         try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
             stmt.setString(1, noteId);
-            stmt.executeQuery();
+            stmt.executeUpdate();
         } catch(SQLException e) {
             e.printStackTrace();
         }
@@ -84,7 +84,7 @@ public class NoteRepository {
         try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
             stmt.setString(1, newContents);
             stmt.setString(2, noteId);
-            stmt.executeQuery();
+            stmt.executeUpdate();
         } catch(SQLException e) {
             e.printStackTrace();
         }

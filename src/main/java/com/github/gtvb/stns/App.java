@@ -56,15 +56,16 @@ public class App {
                 String contents = sc.nextLine();
 
                 ArrayList<Tag> tags = tagRepository.getAllTags();
-                System.out.println(tags);
 
                 int numItems = tags.size();
                 int maxItemsPerRow = 4;
                 int numRows = (int) Math.ceil((double) numItems / maxItemsPerRow);
 
+                int count = 0;
                 for (int row = 0; row < numRows; row++) {
-                    for (int col = 0; col < maxItemsPerRow; col++) {
-                        System.out.printf("%d) %s\t", col + 1, tags.get(col).getName());
+                    for (int col = 0; col < maxItemsPerRow && count < tags.size(); col++) {
+                        System.out.printf("%-3d %s\t", count + 1, tags.get(count).getName());
+                        count++;
                     }
                     System.out.println();
                 }
@@ -82,8 +83,8 @@ public class App {
                     }
                 }
 
-                // String createdNoteId = noteRepository.createNote(title, contents, user.getUuid());
-                // noteHasTagRepository.createNoteHasTagRelationship(createdNoteId, pickedTags);
+                String createdNoteId = noteRepository.createNote(title, contents, user.getUuid());
+                noteHasTagRepository.createNoteHasTagRelationship(createdNoteId, pickedTags);
 
                 System.out.println("Note created!");
                 break;
