@@ -17,13 +17,13 @@ public class UserRepository {
     }
 
     public User createUser(String username, String userPassword) {
-        String query = "INSERT INTO User (id, username, user_password) VALUES (?, ?, ?, ?);";
+        String query = "INSERT INTO User (id, username, user_password) VALUES (?, ?, ?);";
         try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
             String userId = UUID.randomUUID().toString();
             stmt.setString(1, userId);
             stmt.setString(2, username);
             stmt.setString(3, userPassword);
-            stmt.executeQuery();
+            stmt.executeUpdate();
 
             return new User(userId, username, userPassword);
         } catch(SQLException e) {
@@ -63,7 +63,7 @@ public class UserRepository {
 
         try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
             stmt.setString(1, username);
-            stmt.setString(1, password);
+            stmt.setString(2, password);
             ResultSet results = stmt.executeQuery();
 
             while(results.next()) {
@@ -85,7 +85,7 @@ public class UserRepository {
         String query = "DELETE FROM User WHERE id = ?";
         try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
             stmt.setString(1, userId);
-            stmt.executeQuery();
+            stmt.executeUpdate();
         } catch(SQLException e) {
             e.printStackTrace();
         }
@@ -96,7 +96,7 @@ public class UserRepository {
         try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
             stmt.setString(1, newUsername);
             stmt.setString(2, userId);
-            stmt.executeQuery();
+            stmt.executeUpdate();
         } catch(SQLException e) {
             e.printStackTrace();
         }
@@ -107,7 +107,7 @@ public class UserRepository {
         try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
             stmt.setString(1, newPassword);
             stmt.setString(2, userId);
-            stmt.executeQuery();
+            stmt.executeUpdate();
         } catch(SQLException e) {
             e.printStackTrace();
         }

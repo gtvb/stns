@@ -9,18 +9,24 @@ import java.util.List;
 import com.github.gtvb.stns.domain.model.User;
 
 public class LoginUtils {
-    public static boolean checkIfUserIsLogged(String username, String password) {
-        Path path = Paths.get("login.txt");
+    public static User getLoggedUser() {
         try {
+            Path path = Paths.get("login.txt");
             List<String> userData = Files.readAllLines(path);
-            if(username.equals(userData.get(1)) && password.equals(userData.get(0)))  {
-                return true;
+            if(userData.size() == 0) {
+                return null;
             }
 
-            return false;
+            User user = new User();
+            user.setUuid(userData.get(0));
+            user.setUsername(userData.get(1));
+            user.setUserPassword(userData.get(2));
+            user.setCreatedAt(userData.get(3));
+
+            return user;
         } catch(IOException e){
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
 
@@ -29,10 +35,12 @@ public class LoginUtils {
             Path path = Paths.get("login.txt");
             Files.createFile(path);
 
-            Files.write(path, (user.getUuid() + "\n").getBytes());
-            Files.write(path, (user.getUsername() + "\n").getBytes());
-            Files.write(path, (user.getUserPassword() + "\n").getBytes());
-            Files.write(path, (user.getCreatedAt() + "\n").getBytes());
+            String loginData = user.getUuid() + "\n" +
+                        user.getUsername() + "\n" +
+                        user.getUserPassword() + "\n" +
+                        user.getCreatedAt() + "\n";
+
+            Files.write(path, loginData.getBytes());
                  
             return true;
         } catch (IOException e) {

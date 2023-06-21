@@ -10,4 +10,16 @@ public class Tag {
         this.name = name;
         this.createdAt = createdAt;
     }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
 }

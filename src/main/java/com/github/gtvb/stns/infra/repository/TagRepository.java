@@ -31,7 +31,7 @@ public class TagRepository {
     public ArrayList<Tag> getAllTags() {
         ArrayList<Tag> tags = new ArrayList<>();
 
-        String query = "SELECT id, tag_name, created_at FROM Tag;";
+        String query = "SELECT id, tag_name, created_at FROM Tag";
 
         try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
             ResultSet results = stmt.executeQuery();

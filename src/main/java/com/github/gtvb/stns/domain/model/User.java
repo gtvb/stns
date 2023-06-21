@@ -6,6 +6,10 @@ public class User {
     String userPassword;
     String createdAt;
 
+    public User() {
+
+    }
+
     public User(String uuid, String username, String userPassword, String createdAt) {
         this.uuid = uuid;
         this.username = username;
@@ -33,5 +37,21 @@ public class User {
 
     public String getCreatedAt() {
         return createdAt;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setUserPassword(String userPassword) {
+        this.userPassword = userPassword;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 }

@@ -21,7 +21,7 @@ public class ProfileRepository {
             stmt.setString(1, UUID.randomUUID().toString());
             stmt.setString(2, userId);
             stmt.setString(3, fullName);
-            stmt.executeQuery();
+            stmt.executeUpdate();
         } catch(SQLException e) {
             e.printStackTrace();
         }
@@ -54,7 +54,7 @@ public class ProfileRepository {
         try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
             stmt.setString(1, newFullName);
             stmt.setString(2, profileId);
-            stmt.executeQuery();
+            stmt.executeUpdate();
         } catch(SQLException e) {
             e.printStackTrace();
         }

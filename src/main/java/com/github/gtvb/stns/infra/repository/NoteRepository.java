@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -17,25 +16,28 @@ public class NoteRepository {
         this.dbConnection = dbConnection;
     }
 
-    public void createNote(String title, String contents, String userId) {
+    public String createNote(String title, String contents, String userId) {
         String query = "INSERT INTO Note (id, user_id, title, contents) VALUES (?, ?, ?, ?);";
         try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
-            stmt.setString(1, UUID.randomUUID().toString());
+            String noteId = UUID.randomUUID().toString();
+            stmt.setString(1, noteId);
             stmt.setString(2, userId);
             stmt.setString(3, title);
             stmt.setString(4, contents);
-            stmt.executeQuery();
+            stmt.executeUpdate();
+
+            return noteId;
         } catch(SQLException e) {
             e.printStackTrace();
         }
+
+        return null;
     };
 
     public ArrayList<Note> getNotesByUserId(String userId) {
         ArrayList<Note> notes = new ArrayList<>();
 
-        String query = "SELECT id, title, contents, created_at"
-                      +"FROM Note"
-                      +"WHERE Note.user_id = ?";
+        String query = "SELECT id, title, contents, created_at FROM Note WHERE user_id = ?";
 
         try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
             stmt.setString(1, userId);
@@ -77,7 +79,7 @@ public class NoteRepository {
         }
     };
 
-    public void editNoteContents(String noteId, String newContents) throws SQLException {
+    public void editNoteContents(String noteId, String newContents) {
         String query = "UPDATE Note SET contents = ? WHERE id = ?";
         try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
             stmt.setString(1, newContents);
