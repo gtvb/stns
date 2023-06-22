@@ -16,16 +16,17 @@ public class UserRepository {
         this.dbConnection = dbConnection;
     }
 
-    public User createUser(String username, String userPassword) {
-        String query = "INSERT INTO User (id, username, user_password) VALUES (?, ?, ?);";
+    public User createUser(String username, String userPassword, String createdAt) {
+        String query = "INSERT INTO User (id, username, user_password, createdAt) VALUES (?, ?, ?);";
         try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
             String userId = UUID.randomUUID().toString();
             stmt.setString(1, userId);
             stmt.setString(2, username);
             stmt.setString(3, userPassword);
+            stmt.setString(4, createdAt);
             stmt.executeUpdate();
 
-            return new User(userId, username, userPassword);
+            return new User(userId, username, userPassword, createdAt);
         } catch(SQLException e) {
             e.printStackTrace();
             return null;

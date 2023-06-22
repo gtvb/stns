@@ -2,10 +2,13 @@ package com.github.gtvb.stns;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import com.github.gtvb.stns.application.gui.notesList.NotesListGui;
+import com.github.gtvb.stns.domain.model.Profile;
 import com.github.gtvb.stns.domain.model.Tag;
 import com.github.gtvb.stns.domain.model.User;
 import com.github.gtvb.stns.infra.db.Db;
@@ -102,7 +105,12 @@ public class App {
                 System.out.printf("Your full name: ");
                 String fullName = sc.nextLine();
 
-                User newUser = userRepository.createUser(username, password);
+                LocalDateTime now = LocalDateTime.now();
+                DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+                String createdAt = now.format(format);
+
+                User newUser = userRepository.createUser(username, password, createdAt);
                 profileRepository.createProfile(newUser.getUuid(), fullName);
 
                 LoginUtils.login(newUser);
@@ -125,6 +133,19 @@ public class App {
                 } else {
                     System.out.println("User dos not exist. Create a new one!");
                 }
+                break;
+            }
+            case "profile": {
+                User loggedUser = LoginUtils.getLoggedUser();
+                if(loggedUser == null) {
+                    System.out.println("No user logged in...");
+                    break;
+                }
+                ProfileRepository profileRepository = new ProfileRepository(conn);
+                Profile profileData = profileRepository.getProfileByUserId(loggedUser.getUuid());
+
+                System.out.printf("Your data\nFull name: %s\nUsername: %s\nCreated at: %s\n",
+                                    profileData.getFullName(), loggedUser.getUsername(), loggedUser.getCreatedAt());
                 break;
             }
             case "logout": {

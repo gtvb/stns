@@ -1,7 +1,6 @@
 package com.github.gtvb.stns.application.gui.notesList;
 
 import java.util.ArrayList;
-import java.util.concurrent.CompletableFuture;
 
 import com.github.gtvb.stns.domain.model.Note;
 import com.github.gtvb.stns.domain.model.NoteAndTag;
@@ -10,16 +9,21 @@ import com.github.gtvb.stns.domain.model.User;
 import com.github.gtvb.stns.infra.repository.NoteHasTagRepository;
 import com.github.gtvb.stns.infra.repository.NoteRepository;
 import com.github.gtvb.stns.infra.repository.TagRepository;
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.BasicWindow;
+import com.googlecode.lanterna.gui2.Border;
+import com.googlecode.lanterna.gui2.BorderLayout;
+import com.googlecode.lanterna.gui2.Borders;
 import com.googlecode.lanterna.gui2.Button;
 import com.googlecode.lanterna.gui2.Direction;
 import com.googlecode.lanterna.gui2.GridLayout;
 import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.LinearLayout;
+import com.googlecode.lanterna.gui2.LinearLayout.Alignment;
+import com.googlecode.lanterna.gui2.TextBox.Style;
 import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.TextBox;
 import com.googlecode.lanterna.gui2.Window;
-import com.googlecode.lanterna.gui2.LinearLayout.Alignment;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 
 public class NotesListWindow extends BasicWindow {
@@ -45,22 +49,25 @@ public class NotesListWindow extends BasicWindow {
         mainPanel.setLayoutManager(new LinearLayout(Direction.VERTICAL));
 
         notesPanel = new Panel();
-
         if(notesWithTags.size() > 0) {
+            if(notesWithTags.size() > 4) {
+                mainPanel.addComponent(new Button("Next Page", new CloseButtonAction(this)));
+            }
             notesPanel.setLayoutManager(new GridLayout(2).setHorizontalSpacing(5));
+            notesPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
             refreshNotesPanel();
         } else {
             notesPanel.setLayoutManager(new LinearLayout(Direction.VERTICAL));
             notesPanel.addComponent(new Label("There are no notes for this user"), null);
-            notesPanel.addComponent(new Button("Close", new CloseButtonAction(this)), LinearLayout.createLayoutData(Alignment.Center));
         }
 
         mainPanel.addComponent(notesPanel);
+        mainPanel.addComponent(new Button("Close", new CloseButtonAction(this)));
         setComponent(mainPanel);
     }
 
     private void refreshNotesPanel() {
-        notesPanel.removeAllComponents(); // Clear the panel
+        notesPanel.removeAllComponents(); 
 
         for (NoteAndTag note : notesWithTags) {
             Panel notePanel = createNotePanel(note);
@@ -76,11 +83,23 @@ public class NotesListWindow extends BasicWindow {
         Panel panel = new Panel();
         panel.setLayoutManager(new LinearLayout(Direction.VERTICAL));
 
-        panel.addComponent(new Label(note.getCreatedAt()));
         panel.addComponent(new Label(note.getTitle()));
+        panel.addComponent(new Label(note.getCreatedAt()));
 
-        TextBox contentsTextBox = new TextBox(note.getContents())
+        Panel tagsPanel = new Panel();
+        tagsPanel.withBorder(Borders.singleLine("Tags"));
+        tagsPanel.setLayoutManager(new GridLayout(4));
+
+        for(Tag t : noteWithTag.getTags()) {
+            Label tagLabel = new Label("# " + t.getName());
+            tagsPanel.addComponent(tagLabel);
+        }
+
+        panel.addComponent(tagsPanel);
+
+        TextBox contentsTextBox = new TextBox(note.getContents(), Style.MULTI_LINE)
                 .setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
+            contentsTextBox.setPreferredSize(new TerminalSize(50, 8));
         panel.addComponent(contentsTextBox);
 
         Button removeButton = new Button("Remove", new RemoveButtonAction(noteWithTag, this.noteRepository));
@@ -103,14 +122,9 @@ public class NotesListWindow extends BasicWindow {
 
         @Override
         public void run() {
-            CompletableFuture.runAsync(new Runnable() {
-                @Override
-                public void run() {
-                    noteRepository.deleteNoteById(note.getNote().getUuid()); 
-                    notesWithTags.remove(note);
-                    refreshNotesPanel();
-                }
-            });
+            noteRepository.deleteNoteById(note.getNote().getUuid()); 
+            notesWithTags.remove(note);
+            refreshNotesPanel();
         }
     }
 
@@ -130,14 +144,9 @@ public class NotesListWindow extends BasicWindow {
             final String newContents = contentsTextBox.getText();
             note.getNote().setContents(newContents);
 
-            CompletableFuture.runAsync(new Runnable() {
-                @Override
-                public void run() {
-                    noteRepository.editNoteContents(note.getNote().getUuid(), newContents);
-                    MessageDialog.showMessageDialog(getTextGUI(), "Note Saved", "Contents saved successfully!");
-                    refreshNotesPanel();
-                }
-            });
+            noteRepository.editNoteContents(note.getNote().getUuid(), newContents);
+            MessageDialog.showMessageDialog(getTextGUI(), "Note Saved", "Contents saved successfully!");
+            refreshNotesPanel();
         }
     }
 

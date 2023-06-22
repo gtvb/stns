@@ -12,4 +12,16 @@ public class Profile {
         // this.noteDisplayStyle = noteDisplayStyle;
         this.fullName = fullName;
     }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
 }

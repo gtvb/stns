@@ -53,9 +53,11 @@ public class TagRepository {
     public ArrayList<Tag> getTagsInsideNote(String noteUuid) {
         ArrayList<Tag> tags = new ArrayList<>();
 
-        String query = "SELECT id, tag_name, created_at FROM Tag;";
+        String query = "SELECT DISTINCT T.id, T.tag_name, T.created_at FROM Tag as T, User as U, Note_has_Tag as NhT "
+                       +"WHERE NhT.note_id = ? AND NhT.tag_id = T.id";
 
         try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
+            stmt.setString(1, noteUuid);
             ResultSet results = stmt.executeQuery();
 
             while(results.next()) {
