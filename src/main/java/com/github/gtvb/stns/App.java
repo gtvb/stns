@@ -18,11 +18,18 @@ import com.github.gtvb.stns.infra.repository.ProfileRepository;
 import com.github.gtvb.stns.infra.repository.TagRepository;
 import com.github.gtvb.stns.infra.repository.UserRepository;
 import com.github.gtvb.stns.utils.LoginUtils;
+import com.github.gtvb.stns.utils.PasswordHasher;
 
 public class App {
     public static void main(String[] args) {
         if(args.length == 0) {
-            System.out.println("Help here");
+            System.out.printf("stns - Simple Terminal Note System\n\nUSAGE: stns [COMMAND]\n\nAvailable Commands\n"
+                             +"\tnew-user: Creates a new user and logs him/her in\n"
+                             +"\tlogin: Attempts to log in a given user with a username and password\n"
+                             +"\tlogout: Logs the user out\n"
+                             +"\tprofile: If logged in, shows the current user's data\n"
+                             +"\tnew-note: Creates a new note\n"
+                             +"\tnotes: Opens an interactive GUI that allows the user to visualize, remove and edit notes\n");
             return;
         }
 
@@ -110,7 +117,7 @@ public class App {
 
                 String createdAt = now.format(format);
 
-                User newUser = userRepository.createUser(username, password, createdAt);
+                User newUser = userRepository.createUser(username, PasswordHasher.hashPassword(password), createdAt);
                 profileRepository.createProfile(newUser.getUuid(), fullName);
 
                 LoginUtils.login(newUser);
@@ -126,13 +133,18 @@ public class App {
                 System.out.printf("Your password: ");
                 String password = sc.nextLine();
 
-                User user = userRepository.getUserByNameAndPassword(username, password);
+                User user = userRepository.getUserByUsername(username);
                 if(user != null) {
+                    if(!PasswordHasher.checkIfPasswordMatches(password, user.getUserPassword())) {
+                        System.out.println("Incorrect password!");
+                        break;
+                    }
                     LoginUtils.login(user);
                     System.out.println("Successfully logged in");
                 } else {
                     System.out.println("User dos not exist. Create a new one!");
                 }
+
                 break;
             }
             case "profile": {
@@ -149,7 +161,9 @@ public class App {
                 break;
             }
             case "logout": {
-                LoginUtils.logout();
+                if(LoginUtils.getLoggedUser() != null) {
+                    LoginUtils.logout();
+                }
                 break;
             }
         }

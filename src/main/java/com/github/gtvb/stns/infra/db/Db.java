@@ -43,7 +43,7 @@ public class Db {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS User (" +
                     "id VARCHAR(36) NOT NULL UNIQUE PRIMARY KEY," +
                     "username VARCHAR(50) NOT NULL UNIQUE," +
-                    "user_password VARCHAR(25) NOT NULL UNIQUE," +
+                    "user_password TEXT NOT NULL UNIQUE," +
                     "created_at DATETIME DEFAULT CURRENT_TIMESTAMP" +
                     ")");
             

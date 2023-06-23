@@ -1,6 +1,5 @@
 package com.github.gtvb.stns.infra.repository;
 
-import java.net.PasswordAuthentication;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,7 +16,7 @@ public class UserRepository {
     }
 
     public User createUser(String username, String userPassword, String createdAt) {
-        String query = "INSERT INTO User (id, username, user_password, createdAt) VALUES (?, ?, ?);";
+        String query = "INSERT INTO User (id, username, user_password, created_at) VALUES (?, ?, ?, ?);";
         try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
             String userId = UUID.randomUUID().toString();
             stmt.setString(1, userId);
@@ -57,14 +56,13 @@ public class UserRepository {
         return user;
     };
 
-    public User getUserByNameAndPassword(String username, String password) {
+    public User getUserByUsername(String username) {
         User user = null;
 
-        String query = "SELECT id, username, user_password, created_at FROM User WHERE username = ? AND user_password = ?";
+        String query = "SELECT id, username, user_password, created_at FROM User WHERE username = ?";
 
         try(PreparedStatement stmt = this.dbConnection.prepareStatement(query)) {
             stmt.setString(1, username);
-            stmt.setString(2, password);
             ResultSet results = stmt.executeQuery();
 
             while(results.next()) {
