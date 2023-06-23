@@ -1,9 +1,9 @@
 package com.github.gtvb.stns.domain.model;
 
 public class Tag {
-    String uuid;
-    String name;
-    String createdAt;
+    private String uuid;
+    private String name;
+    private String createdAt;
 
     public Tag(String uuid, String name, String createdAt) {
         this.uuid = uuid;
