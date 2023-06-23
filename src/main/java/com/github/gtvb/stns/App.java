@@ -166,6 +166,9 @@ public class App {
                 }
                 break;
             }
+            default:
+                System.out.println("This command does not exist");
+                break;
         }
 
         sc.close();

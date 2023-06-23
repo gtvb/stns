@@ -25,7 +25,7 @@ public class LoginUtils {
 
             return user;
         } catch(IOException e){
-            e.printStackTrace();
+            System.out.println("Could not get logged user " + e.getMessage());
             return null;
         }
     }
@@ -44,7 +44,7 @@ public class LoginUtils {
                  
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Could not execute login " + e.getMessage());
             return false;
         }
     }
@@ -54,7 +54,7 @@ public class LoginUtils {
         try {
             Files.deleteIfExists(path);
         } catch(IOException e){
-            e.printStackTrace();
+            System.out.println("Could not execute logout " + e.getMessage());
         }
     }
 }
