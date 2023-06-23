@@ -10,7 +10,6 @@ import java.util.UUID;
 import com.github.gtvb.stns.domain.model.Tag;
 
 public class TagRepository {
-    private static int maxTagsForSelectStatement = 15;
     private Connection dbConnection;
 
     public TagRepository(Connection dbConnection) {

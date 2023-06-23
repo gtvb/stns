@@ -6,19 +6,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class Db {
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/";
-    private static final String DB_USER = "gabriel";
-    private static final String DB_PASSWORD = "guetefo3322";
-    private static final String DB_NAME = "notes_app_db";
+import io.github.cdimascio.dotenv.Dotenv;
 
+public class Db {
     public static Connection connectToDatabase() {
+        Dotenv dotenv = Dotenv.load();
+
+        String dbUrl = dotenv.get("MYSQL_DB_URL");
+        String dbUser = dotenv.get("MYSQL_DB_USER");
+        String dbPassword = dotenv.get("MYSQL_DB_PASSWORD");
+        String dbName = dotenv.get("MYSQL_DB_NAME");
+
         Connection connection = null;
         try {
-            connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
 
-            createDatabaseIfNotExists(connection);
-            connection.setCatalog(DB_NAME);
+            createDatabaseIfNotExists(connection, dbName);
+            connection.setCatalog(dbName);
             
             populateDatabase(connection);
 
@@ -30,9 +34,9 @@ public class Db {
         return null;
     }
 
-    private static void createDatabaseIfNotExists(Connection connection) {
+    private static void createDatabaseIfNotExists(Connection connection, String dbName) {
         try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("CREATE DATABASE IF NOT EXISTS " + DB_NAME);
+            statement.executeUpdate("CREATE DATABASE IF NOT EXISTS " + dbName);
         } catch (SQLException e) {
             e.printStackTrace();
         }
